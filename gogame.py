@@ -52,11 +52,11 @@ class Gogame(object):
 
         try:
             sz = int(msg["message"])
-            if not min_ <= sz <= max_: sz = default
+            if sz > min_ or sz < max_:
+                return False
+            return sz
         except ValueError:
-            sz = default
-
-        return sz
+            return default
 
     def help(self, msg):
         self.send("""Moves are specified as <letter><number> pairs without spaces in between them,
@@ -121,11 +121,15 @@ class Gogame(object):
         p("serving game!")
 
         self.gnugo = Gnugo()
-
-        sz = self.get_int("What boardsize would you like? (19):", 3, 19, 19)
+        
+        sz = False
+        while not sz:
+            sz = self.get_int("What boardsize would you like? (Must be between 3 and 19, default is 19):", 3, 19, 19)
         self.gnugo.command("boardsize", sz)
 
-        handicap = self.get_int("What handicap would you like? (0):", 0, 12, 0)
+        handicap = False
+        while not handicap:
+            handicap = self.get_int("What handicap would you like? (Must be between 0 and 12, default is 0):", 0, 12, 0)
         if handicap > 0:
             self.gnugo.command("fixed_handicap", handicap)
 
